@@ -5,6 +5,8 @@ Single entry point for the workshop. One command to remember.
     ./workshop check              Verify your setup (run this first!)
     ./workshop demo               Run the guided demo
     ./workshop demo --show-prompt Peek under the hood: see the full assembled context
+    ./workshop demo --record FILE Run the demo and save a transcript for offline replay
+    ./workshop replay [FILE]      Replay a saved transcript offline (no API key needed)
     ./workshop breakout           List available breakouts
     ./workshop breakout <name>    Run a specific breakout
     ./workshop reset              Delete all memory_store.json files
@@ -19,6 +21,8 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).parent
 GUIDED_DEMO = REPO_ROOT / "01-guided-demo" / "agent.py"
+GUIDED_REPLAY = REPO_ROOT / "01-guided-demo" / "replay.py"
+DEFAULT_TRANSCRIPT = REPO_ROOT / "01-guided-demo" / "sample_transcript.json"
 BREAKOUTS_DIR = REPO_ROOT / "02-breakouts"
 CHECK_SCRIPT = REPO_ROOT / "check_setup.py"
 
@@ -49,6 +53,18 @@ def cmd_demo(extra_args=None):
         print("Can't find {} — are you in the repo root?".format(GUIDED_DEMO))
         sys.exit(1)
     _run_python(GUIDED_DEMO, extra_args)
+
+
+def cmd_replay(extra_args=None):
+    """Replay a saved transcript offline. Defaults to the bundled sample.
+
+    Needs no API key -- it re-renders a captured run, so the Agent SDK demo
+    can be shown with no credits and no flakiness."""
+    args = list(extra_args) if extra_args else []
+    # If no file path was given (only flags like --verbose), use the sample.
+    if not any(not a.startswith("-") for a in args):
+        args.insert(0, str(DEFAULT_TRANSCRIPT))
+    _run_python(GUIDED_REPLAY, args)
 
 
 def _list_breakouts():
@@ -122,6 +138,7 @@ def cmd_help():
 COMMANDS = {
     "check": cmd_check,
     "demo": cmd_demo,
+    "replay": cmd_replay,
     "breakout": cmd_breakout,
     "reset": cmd_reset,
     "help": cmd_help,
@@ -143,7 +160,7 @@ def main():
 
     # Demo and breakout take optional extra arguments.
     extra = sys.argv[2:] if len(sys.argv) > 2 else []
-    if cmd == "demo":
+    if cmd in ("demo", "replay"):
         handler(extra or None)
     elif cmd == "breakout":
         handler(extra[0] if extra else None)

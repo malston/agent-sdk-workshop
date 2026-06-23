@@ -19,12 +19,12 @@
 
 → **See [`GUIDE.md`](./GUIDE.md) for the full stage-by-stage walkthrough** — what to do, what to observe, what's happening under the hood at each stage.
 
-| Stage | Switch | What changes |
-|---|---|---|
-| 0 | *(all off)* | Baseline — just chat with a system prompt |
-| 1 | `ENABLE_TOOLS` | Agent can look things up |
-| 2 | `ENABLE_SUBAGENTS` | Agent delegates to specialists |
-| 3 | `ENABLE_MEMORY` | Agent remembers between runs |
+| Stage | Switch             | What changes                              |
+| ----- | ------------------ | ----------------------------------------- |
+| 0     | _(all off)_        | Baseline — just chat with a system prompt |
+| 1     | `ENABLE_TOOLS`     | Agent can look things up                  |
+| 2     | `ENABLE_SUBAGENTS` | Agent delegates to specialists            |
+| 3     | `ENABLE_MEMORY`    | Agent remembers between runs              |
 
 ---
 
@@ -40,15 +40,34 @@ The data is interlinked — Ironvane's departing CPO shows up in Tinplate's hiri
 
 ## File map
 
-| File | Purpose | Edit it? |
-|---|---|---|
-| **`config.py`** | The three toggles + stretch goals | **YES** |
-| `GUIDE.md` | Stage-by-stage walkthrough | No (read it!) |
-| `agent.py` | Entry point. **`build_options()` is the lesson** — read it. | No |
-| `tools.py` | `@tool`-decorated research tools | Peek at Stage 1 |
-| `subagents.py` | `AgentDefinition` specs | Peek at Stage 2 |
-| `memory.py` | Memory tool + context-injection hook | Peek at Stage 3 |
-| `mock_data/*.json` | Fictional company data | No |
+| File                     | Purpose                                                     | Edit it?        |
+| ------------------------ | ----------------------------------------------------------- | --------------- |
+| **`config.py`**          | The three toggles + stretch goals                           | **YES**         |
+| `GUIDE.md`               | Stage-by-stage walkthrough                                  | No (read it!)   |
+| `agent.py`               | Entry point. **`build_options()` is the lesson** — read it. | No              |
+| `tools.py`               | `@tool`-decorated research tools                            | Peek at Stage 1 |
+| `subagents.py`           | `AgentDefinition` specs                                     | Peek at Stage 2 |
+| `memory.py`              | Memory tool + context-injection hook                        | Peek at Stage 3 |
+| `mock_data/*.json`       | Fictional company data                                      | No              |
+| `replay.py`              | Offline transcript replay (no API key)                      | No              |
+| `sample_transcript.json` | Bundled sample for `./workshop replay`                      | No              |
+
+---
+
+## Offline replay (no API key)
+
+The demo runs the agent live through the SDK, so it needs an API key. To present it with no key and no flakiness, replay a captured transcript:
+
+```bash
+./workshop replay              # render the bundled sample
+./workshop replay --verbose    # also show tool calls
+```
+
+Capture a fresh transcript from a real run, then replay it:
+
+```bash
+./workshop demo --record 01-guided-demo/sample_transcript.json
+```
 
 ---
 

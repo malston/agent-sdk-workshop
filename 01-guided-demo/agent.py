@@ -13,6 +13,7 @@ Run with:
 """
 
 import asyncio
+import json
 import sys
 
 # Load ANTHROPIC_API_KEY from the repo-root .env file. load_dotenv() walks up
@@ -38,6 +39,17 @@ import config
 from tools import research_server, RESEARCH_TOOL_NAMES
 from subagents import SUBAGENTS, ORCHESTRATOR_PROMPT_SUFFIX
 from memory import load_memory_summary, make_memory_server, MEMORY_TOOL_NAMES, memory_hook
+from replay import events_from_message
+
+
+def _record_path(argv: list[str]) -> str | None:
+    """Return the path after --record, or None. Used to capture a transcript
+    for offline replay (see replay.py)."""
+    if "--record" in argv:
+        i = argv.index("--record")
+        if i + 1 < len(argv):
+            return argv[i + 1]
+    return None
 
 
 # Base system prompt for the briefing agent. The modules below add to this
@@ -377,6 +389,16 @@ async def main() -> None:
 
     verbose = config.VERBOSITY == "verbose"
 
+    # --record FILE: capture each message as transcript events so the run can
+    # be replayed offline later (see replay.py). No effect when not recording.
+    record_path = _record_path(sys.argv)
+    recorded: list[dict] = []
+
+    def consume(message) -> None:
+        render_message(message, verbose)
+        if record_path:
+            recorded.extend(events_from_message(message))
+
     # ClaudeSDKClient (vs the simpler query() function) gives us a persistent
     # connection — useful for multi-turn follow-ups, and required for hooks
     # to fire reliably. The async-with block handles connection lifecycle.
@@ -388,7 +410,7 @@ async def main() -> None:
         # agentic loop internally — tool execution, result feeding, retry
         # handling. We're just subscribing to the event stream.
         async for message in client.receive_response():
-            render_message(message, verbose)
+            consume(message)
 
         # Follow-up loop: keep the same client alive so the conversation
         # context carries forward. This is "within-session" memory — it
@@ -404,7 +426,12 @@ async def main() -> None:
             print()
             await client.query(follow)
             async for message in client.receive_response():
-                render_message(message, verbose)
+                consume(message)
+
+    if record_path:
+        with open(record_path, "w", encoding="utf-8") as f:
+            json.dump(recorded, f, indent=2)
+        print(f"\n{C.GRAY}Saved transcript: {record_path}{C.RESET}")
 
 
 if __name__ == "__main__":

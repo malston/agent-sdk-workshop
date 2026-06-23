@@ -1,0 +1,39 @@
+[
+  {
+    "type": "note",
+    "text": "Synthetic sample transcript for offline replay. Regenerate from a real run with: ./workshop demo --record 01-guided-demo/sample_transcript.json"
+  },
+  {
+    "type": "assistant_text",
+    "text": "I'll pull current news and financials on Ironvane Freight Systems, then summarize what matters for the meeting."
+  },
+  {
+    "type": "tool_use",
+    "name": "search_company_news",
+    "input": { "company": "Ironvane Freight Systems" }
+  },
+  {
+    "type": "tool_result",
+    "content": "Recent news for Ironvane Freight Systems:\n[2026-02-14] Wins three-year contract with national grocery chain (~$14M/yr at full ramp, 340 distribution centers).\n[2026-02-03] CPO Dana Okafor departs for Tinplate Merchant Systems ahead of a critical fundraising year.\n[2026-01-16] Opens European HQ in Amsterdam (initial team of 25)."
+  },
+  {
+    "type": "tool_use",
+    "name": "get_company_financials",
+    "input": { "company": "Ironvane Freight Systems" }
+  },
+  {
+    "type": "tool_result",
+    "content": "{\"company\": \"Ironvane Freight Systems\", \"revenue_ttm_usd\": 89000000, \"revenue_growth_yoy_pct\": 67, \"gross_margin_pct\": 72, \"net_income_ttm_usd\": -41000000, \"cash_on_hand_usd\": 88000000, \"notes\": \"High-growth, high-burn. ~21 months runway at current burn.\"}"
+  },
+  {
+    "type": "assistant_text",
+    "text": "Ironvane Freight Systems - briefing\n\nMomentum: just landed its largest customer to date, a national grocery chain (~$14M/yr at full ramp across 340 DCs, rollout begins Q2 2026). Revenue $89M TTM, up 67% YoY at 72% gross margin.\n\nWatch: burning hard - net income -$41M TTM against $88M cash, ~21 months runway, so a raise or path-to-profit inflection is likely in 2026. Product leadership risk too: CPO Dana Okafor (key API-platform architect) just left for a competitor right before that raise.\n\nBring up: the grocery win as proof of traction, and ask how they're backfilling product leadership ahead of the Series D conversation."
+  },
+  {
+    "type": "result",
+    "is_error": false,
+    "result": "Briefing complete.",
+    "num_turns": 3,
+    "cost": 0.0192
+  }
+]
