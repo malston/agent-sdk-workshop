@@ -295,6 +295,12 @@ def build_options() -> ClaudeAgentOptions:
         # likely use "default" and a can_use_tool callback — but for the
         # workshop we want smooth demos.
         permission_mode="bypassPermissions",
+        # Isolate the agent from the host Claude Code environment so each stage
+        # shows only what this file declares: no inherited skills, settings, or
+        # MCP servers from the developer's machine.
+        setting_sources=[],
+        skills=[],
+        strict_mcp_config=True,
     )
 
 
